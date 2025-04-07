@@ -13,7 +13,7 @@ Urbanite is a framework for human-AI collaboration in urban visual analytics. Ur
 Gustavo Moreira, Leonardo Ferreira, Carolina Veiga, Maryam Hosseini, and Fabio Miranda  
 Paper: Under Review
 
-Video:
+<!-- Video: -->
 
 <!-- <div align="center">
   <video src="https://github.com/urban-toolkit/curio/assets/2387594/6d29bda8-5e94-4496-a4ae-fd55adff024f" />
