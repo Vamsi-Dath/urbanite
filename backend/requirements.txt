@@ -1,0 +1,10 @@
+Flask==3.0.1
+Flask-Migrate==4.0.5
+Flask-SQLAlchemy==3.1.1
+requests==2.31.0
+uuid==1.30
+google-auth==2.27.0
+openai==1.61.0
+fiona==1.9.6
+pandas==2.2.3
+geopandas==1.0.1

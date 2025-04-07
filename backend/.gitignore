@@ -1,0 +1,7 @@
+**/__pycache__/
+instance/
+*.db
+api.env
+*.csv
+*.json
+*.geojson

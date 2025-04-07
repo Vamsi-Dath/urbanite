@@ -1,0 +1,9 @@
+::placeholder {
+    color: #58abfd;
+    opacity: 1; 
+}
+
+input:focus {
+    outline: none;
+    box-shadow: none;
+}

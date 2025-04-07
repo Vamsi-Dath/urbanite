@@ -1,0 +1,561 @@
+{
+  "dataflow": {
+    "nodes": [
+      {
+        "id": "node1",
+        "type": "DATA_LOADING",
+        "x": -688.4302434165393,
+        "y": -105.69579889496791,
+        "content": "import pandas as pd\ndf = pd.read_csv('access_attributes.csv')\nreturn df\n",
+        "out": "DATAFRAME",
+        "in": "JSON",
+        "goal": "Load 'access_attributes' CSV file from local source.",
+        "metadata": {
+          "keywords": [
+            0,
+            1,
+            2
+          ]
+        }
+      },
+      {
+        "id": "node2",
+        "type": "DATA_LOADING",
+        "x": -657.0541607822902,
+        "y": 801.1250959222709,
+        "content": "import geopandas as gpd\r\n\r\ngdf_neighborhood = gpd.read_file(\"access_score_neighborhood.geojson\")[[\"coverage\", \"avg_attribute_count\", \"geometry\", \"neighborhood_name\"]]\r\n\r\nreturn gdf_neighborhood",
+        "out": "GEODATAFRAME",
+        "in": "JSON",
+        "goal": "Load key fields from the 'access_score_neighborhood' GeoJSON dataset, including coverage, average attribute count, and geometry for further analysis and visualization.",
+        "metadata": {
+          "keywords": [
+            7,
+            9,
+            8
+          ]
+        }
+      },
+      {
+        "id": "node3",
+        "type": "DATA_LOADING",
+        "x": -1688.224154911683,
+        "y": -929.0303045186827,
+        "content": "import geopandas as gpd\n\ngdf_streets = gpd.read_file(\"access_score_streets.geojson\")[[\"attribute_count\", \"geometry\"]]\n\nreturn gdf_streets\n",
+        "out": "GEODATAFRAME",
+        "in": "JSON",
+        "goal": "Load 'access_score_streets' GeoJSON file from local source. Only keeping 'attribute_count' and 'geometry' columns.''",
+        "metadata": {
+          "keywords": [
+            10,
+            11
+          ]
+        }
+      },
+      {
+        "id": "node4",
+        "type": "DATA_CLEANING",
+        "x": 188.76311569423615,
+        "y": -104.32620772930929,
+        "content": "import pandas as pd\r\nimport geopandas as gpd\r\nfrom shapely.geometry import Point\r\n\r\ndf_point = arg\r\n\r\ncolumns_to_keep = [\"Label Type\", \"Attribute Latitude\", \"Attribute Longitude\", \"Agree Count\", \"Disagree Count\", \"Unsure Count\"]\r\ndf_point_filtered = df_point[columns_to_keep]\r\n\r\ndf_point_filtered[\"Label Type\"] = df_point_filtered[\"Label Type\"].fillna(\"Other\")\r\ndf_point_filtered = df_point_filtered.dropna(subset=[\"Attribute Latitude\"])\r\ndf_point_filtered = df_point_filtered.dropna(subset=[\"Attribute Longitude\"])\r\ndf_point_filtered[\"Agree Count\"] = df_point_filtered[\"Agree Count\"].fillna(0)\r\ndf_point_filtered[\"Disagree Count\"] = df_point_filtered[\"Disagree Count\"].fillna(0)\r\ndf_point_filtered[\"Unsure Count\"] = df_point_filtered[\"Unsure Count\"].fillna(0)\r\n\r\ndf_point_filtered = df_point_filtered.rename(columns={\"Label Type\": \"label\"})\r\ndf_point_filtered = df_point_filtered.rename(columns={\"Attribute Latitude\": \"latitude\"})\r\ndf_point_filtered = df_point_filtered.rename(columns={\"Attribute Longitude\": \"longitude\"})\r\ndf_point_filtered = df_point_filtered.rename(columns={\"Agree Count\": \"agree\"})\r\ndf_point_filtered = df_point_filtered.rename(columns={\"Disagree Count\": \"disagree\"})\r\ndf_point_filtered = df_point_filtered.rename(columns={\"Unsure Count\": \"unsure\"})\r\n\r\ndf_point_filtered[\"geometry\"] = df_point_filtered.apply(lambda row: Point(row[\"longitude\"], row[\"latitude\"]), axis=1)\r\n\r\ngdf_point = gpd.GeoDataFrame(df_point_filtered, geometry=\"geometry\", crs=\"EPSG:4326\")\r\n\r\nreturn gdf_point",
+        "out": "DATAFRAME",
+        "in": "DATAFRAME",
+        "goal": "Clean and transform the 'access_attributes' dataset by filtering relevant fields, filling missing values, and creating a GeoDataFrame for point geometries based on latitude and longitude.",
+        "metadata": {
+          "keywords": [
+            0,
+            3,
+            4,
+            5,
+            6
+          ]
+        }
+      },
+      {
+        "id": "node5",
+        "type": "DATA_CLEANING",
+        "x": 166.8794125717717,
+        "y": 802,
+        "content": "import geopandas as gpd\r\n\r\ngdf_neighborhood = arg\r\n\r\ngdf_neighborhood = gdf_neighborhood.join(pd.json_normalize(gdf_neighborhood[\"avg_attribute_count\"])).drop(columns=[\"avg_attribute_count\"])\r\n\r\ngdf_neighborhood = gdf_neighborhood.dropna(subset=[\"coverage\"])\r\ngdf_neighborhood = gdf_neighborhood.dropna(subset=[\"geometry\"])\r\ngdf_neighborhood = gdf_neighborhood.dropna(subset=[\"neighborhood_name\"])\r\ngdf_neighborhood[\"CurbRamp\"] = gdf_neighborhood[\"CurbRamp\"].fillna(0)\r\ngdf_neighborhood[\"NoCurbRamp\"] = gdf_neighborhood[\"NoCurbRamp\"].fillna(0)\r\ngdf_neighborhood[\"Obstacle\"] = gdf_neighborhood[\"Obstacle\"].fillna(0)\r\ngdf_neighborhood[\"SurfaceProblem\"] = gdf_neighborhood[\"SurfaceProblem\"].fillna(0)\r\n\r\nreturn gdf_neighborhood",
+        "out": "GEODATAFRAME",
+        "in": "GEODATAFRAME",
+        "goal": "Clean and filter 'access_score_neighborhood' retaining key fields.",
+        "metadata": {
+          "keywords": [
+            7,
+            9
+          ]
+        }
+      },
+      {
+        "id": "node6",
+        "type": "DATA_CLEANING",
+        "x": -884.2023035131322,
+        "y": -927.7654271715688,
+        "content": "import geopandas as gpd\r\n\r\ngdf_streets = arg\r\n\r\ngdf_streets = gdf_streets.join(pd.json_normalize(gdf_streets[\"attribute_count\"])).drop(columns=[\"attribute_count\"])\r\n\r\ngdf_streets = gdf_streets.dropna(subset=[\"geometry\"])\r\ngdf_streets[\"CurbRamp\"] = gdf_streets[\"CurbRamp\"].fillna(0)\r\ngdf_streets[\"NoCurbRamp\"] = gdf_streets[\"NoCurbRamp\"].fillna(0)\r\ngdf_streets[\"Obstacle\"] = gdf_streets[\"Obstacle\"].fillna(0)\r\ngdf_streets[\"SurfaceProblem\"] = gdf_streets[\"SurfaceProblem\"].fillna(0)\r\n\r\nreturn gdf_streets",
+        "out": "GEODATAFRAME",
+        "in": "GEODATAFRAME",
+        "goal": "Clean and filter 'access_score_streets' retaining key fields.",
+        "metadata": {
+          "keywords": [
+            10,
+            11
+          ]
+        }
+      },
+      {
+        "id": "node7",
+        "type": "COMPUTATION_ANALYSIS",
+        "x": 1097.2506666434563,
+        "y": -104.11953095511926,
+        "content": "gdf_point = arg.set_crs(4326)\r\ngdf_point = gdf_point.to_crs(3395)\r\n\r\ngdf_point[\"total_votes\"] = gdf_point[\"agree\"] + gdf_point[\"disagree\"] + gdf_point[\"unsure\"]\r\n\r\ngdf_point['total_votes'] = gdf_point['total_votes'].replace(0, 1)\r\n\r\ngdf_point[\"uncertainty\"] = (abs(gdf_point[\"disagree\"] - gdf_point[\"agree\"]) + gdf_point[\"unsure\"]) / gdf_point[\"total_votes\"]\r\n\r\ngdf_point = gdf_point[[\"uncertainty\", \"geometry\"]]\r\n\r\ngdf_point.metadata = {\r\n 'name': 'ponctual'\r\n}\r\n\r\nreturn gdf_point",
+        "out": "DATAFRAME",
+        "in": "DATAFRAME",
+        "goal": "Compute uncertainty score based on attribute counts and derive uncertainty score from user agreement metrics.",
+        "metadata": {
+          "keywords": [
+            0,
+            12,
+            13
+          ]
+        }
+      },
+      {
+        "id": "node13",
+        "type": "MERGE_FLOW",
+        "x": 2636,
+        "y": 412,
+        "out": "DATAFRAME",
+        "in": "DATAFRAME",
+        "goal": "Merge computed scores with 'access_score_neighborhood' cleaned data for neighborhood visualization.",
+        "metadata": {
+          "keywords": [
+            0,
+            12
+          ]
+        }
+      },
+      {
+        "id": "node14",
+        "type": "MERGE_FLOW",
+        "x": 1706,
+        "y": -814,
+        "out": "DATAFRAME",
+        "in": "DATAFRAME",
+        "goal": "Merge computed scores with 'access_score_streets' cleaned data for street visualization.",
+        "metadata": {
+          "keywords": [
+            0,
+            12
+          ]
+        }
+      },
+      {
+        "id": "node15",
+        "type": "DATA_TRANSFORMATION",
+        "x": 2872.5177977468156,
+        "y": -544.2588988734077,
+        "content": "import geopandas as gpd\r\n\r\ngdf_point = arg[0].set_crs(3395)\r\ngdf_neighborhood = arg[1].set_crs(3395)\r\n\r\ngdf_point = gdf_point.to_crs(gdf_neighborhood.crs)\r\n\r\ngdf_neighborhood[\"neighborhood_id\"] = gdf_neighborhood.index \r\n\r\ngdf_joined = gpd.sjoin(gdf_point, gdf_neighborhood, predicate=\"within\")\r\n\r\ndf_aggregated = gdf_joined.groupby(\"neighborhood_id\")[\"uncertainty\"].mean().reset_index()\r\n\r\ngdf_neighborhood_aggregated = gdf_neighborhood.merge(df_aggregated, on=\"neighborhood_id\", how=\"left\")\r\n\r\ngdf_neighborhood_aggregated[\"uncertainty\"] = gdf_neighborhood_aggregated[\"uncertainty\"].fillna(0)\r\n\r\ngdf_neighborhood_aggregated = gdf_neighborhood_aggregated[[\"geometry\", \"uncertainty\"]]\r\n\r\ngdf_neighborhood_aggregated.metadata = {\r\n 'name': 'neighborhood'\r\n}\r\n\r\nreturn gdf_neighborhood_aggregated",
+        "out": "GEODATAFRAME",
+        "in": "GEODATAFRAME",
+        "goal": "Group point uncertainty score by neighborhood",
+        "metadata": {
+          "keywords": [
+            14,
+            15
+          ]
+        }
+      },
+      {
+        "id": "node16",
+        "type": "DATA_TRANSFORMATION",
+        "x": 1913.1486983549971,
+        "y": -930,
+        "content": "import geopandas as gpd\r\nfrom shapely.ops import nearest_points\r\n\r\ngdf_points = arg[0].set_crs(3395)\r\ngdf_streets = arg[1].set_crs(3395)\r\n\r\ngdf_streets = gdf_streets.sjoin_nearest(gdf_points[['geometry', 'uncertainty']], how=\"left\", distance_col=\"distance\")\r\n\r\ngdf_streets = gdf_streets[[\"geometry\", \"uncertainty\"]]\r\n\r\n\r\ngdf_streets.metadata = {\r\n 'name': 'street'\r\n}\r\n\r\nreturn gdf_streets",
+        "out": "GEODATAFRAME",
+        "in": "GEODATAFRAME",
+        "goal": "Join streets GeoDataFrame with points using nearest neighbor spatial join to incorporate uncertainty and distance information. Set coordinate reference system to 3395 for both datasets.",
+        "metadata": {
+          "keywords": [
+            12
+          ]
+        }
+      },
+      {
+        "id": "node12",
+        "type": "VIS_VEGA",
+        "x": 3248.3191033971034,
+        "y": 554.4247559298842,
+        "content": "{\r\n    \"$schema\": \"https://vega.github.io/schema/vega-lite/v5.json\",\r\n    \"params\": [\r\n        {\r\n            \"name\": \"highlight\",\r\n            \"select\": {\"type\": \"point\", \"on\": \"pointerover\"}\r\n        }\r\n    ],\r\n    \"mark\": {\r\n        \"type\": \"bar\",\r\n        \"fill\": \"#4C78A8\",\r\n        \"stroke\": \"black\",\r\n        \"cursor\": \"pointer\"\r\n    },\r\n    \"encoding\": {\r\n        \"x\": {\r\n            \"field\": \"neighborhood_name\", \r\n            \"type\": \"ordinal\",\r\n            \"sort\": \"y\"\r\n        },\r\n        \"y\": {\"field\": \"accessibility\", \"type\": \"quantitative\"},\r\n        \"fillOpacity\": {\r\n            \"condition\": {\"param\": \"highlight\", \"value\": 1},\r\n            \"value\": 0.3\r\n        },\r\n        \"color\": { \r\n            \"field\": \"interacted\", \r\n            \"type\": \"nominal\", \r\n            \"condition\": {\r\n                \"test\": \"datum.interacted === '1'\", \"value\": \"red\", \"else\": \"blue\"\r\n            } \r\n        }\r\n    },\r\n    \"config\": {\r\n        \"scale\": {\r\n            \"bandPaddingInner\": 0.2\r\n        }\r\n    }\r\n}",
+        "out": "DATAFRAME",
+        "in": "DATAFRAME",
+        "goal": "Plot accessibility by neighborhood linking with accessibility map.",
+        "metadata": {
+          "keywords": [
+            17
+          ]
+        }
+      },
+      {
+        "id": "1a815d0b-2298-4257-ab9a-857dd884338d",
+        "type": "COMPUTATION_ANALYSIS",
+        "x": 1097.4724824063856,
+        "y": 799.2756560300706,
+        "content": "import numpy as np\r\n\r\ngdf_neighborhood = arg.set_crs(4326)\r\ngdf_neighborhood = gdf_neighborhood.to_crs(3395)\r\n\r\nw_noCurb = 1\r\nw_obstacle = 1\r\nw_surfaceProblem = 1\r\nw_curb = 1\r\n\r\nnumerator = (w_noCurb * gdf_neighborhood[\"NoCurbRamp\"] + \r\n             w_obstacle * gdf_neighborhood[\"Obstacle\"] + \r\n             w_surfaceProblem * gdf_neighborhood[\"SurfaceProblem\"])\r\n\r\ndenominator = w_curb * gdf_neighborhood[\"CurbRamp\"]\r\n\r\ngdf_neighborhood[\"accessibility\"] = np.where(\r\n    denominator == 0, \r\n    0, \r\n    numerator / denominator\r\n)\r\n\r\n# gdf_neighborhood[\"accessibility\"] = (w_noCurb * gdf_neighborhood[\"NoCurbRamp\"] + w_obstacle * gdf_neighborhood[\"Obstacle\"] + w_surfaceProblem * gdf_neighborhood[\"SurfaceProblem\"]) / (w_curb * gdf_neighborhood[\"CurbRamp\"])\r\n\r\nmin_val = gdf_neighborhood[\"accessibility\"].min()\r\nmax_val = gdf_neighborhood[\"accessibility\"].max()\r\n\r\ndenominator = max_val - min_val\r\n\r\nif denominator == 0:\r\n    gdf_neighborhood[\"accessibility\"] = 0  # Set a default value\r\nelse:\r\n    gdf_neighborhood[\"accessibility\"] = (gdf_neighborhood[\"accessibility\"] - min_val) / denominator\r\n\r\n\r\n# gdf_neighborhood[\"accessibility\"] = (gdf_neighborhood[\"accessibility\"] - gdf_neighborhood[\"accessibility\"].min()) / (gdf_neighborhood[\"accessibility\"].max() - gdf_neighborhood[\"accessibility\"].min())\r\n\r\ngdf_neighborhood = gdf_neighborhood[[\"geometry\", \"accessibility\", \"neighborhood_name\"]]\r\n\r\ngdf_neighborhood.metadata = {\r\n 'name': 'neighborhood'\r\n}\r\n\r\nreturn gdf_neighborhood",
+        "out": "DEFAULT",
+        "in": "DEFAULT",
+        "goal": "Calculate accessibility score for neighborhood based on 'NoCurbRamp', 'Obstacle', 'Suface Problem', 'CurbRamp' attributes.",
+        "metadata": {
+          "keywords": [
+            15,
+            10
+          ]
+        }
+      },
+      {
+        "id": "3a98c743-bee9-492a-b1ce-dbc17be97f14",
+        "type": "DATA_POOL",
+        "x": 2027.9999999999995,
+        "y": 1360,
+        "out": "DEFAULT",
+        "in": "DEFAULT",
+        "goal": "Load and manage multiple datasets including 'access_attributes', 'access_score_neighborhood', and 'access_score_streets', while ensuring their cleanliness and readiness for analysis, visualization, and interactive exploration based on accessibility scores and user agreement metrics.",
+        "metadata": {
+          "keywords": [
+            15
+          ]
+        }
+      },
+      {
+        "id": "13d263ce-2e82-4e87-bc69-117b06a8a65b",
+        "type": "VIS_UTK",
+        "x": 3243.578204841852,
+        "y": 1393.1381375299884,
+        "content": "{\n    \"components\": [\n        {\n            \"id\": \"grammar_map\",\n            \"position\": {\n                \"width\": [\n                    1,\n                    12\n                ],\n                \"height\": [\n                    1,\n                    4\n                ]\n            }\n        }\n    ],\n    \"knots\": [],\n    \"ex_knots\": [\n        {\n            \"id\": \"neighborhood0\",\n            \"out_name\": \"neighborhood\",\n            \"in_name\": \"accessibility\"\n        },\n        {\n            \"id\": \"neighborhood1\",\n            \"out_name\": \"neighborhood\",\n            \"in_name\": \"neighborhood_name\"\n        }\n    ],\n    \"grid\": {\n        \"width\": 12,\n        \"height\": 4\n    },\n    \"grammar\": false\n}",
+        "out": "DEFAULT",
+        "in": "DEFAULT",
+        "goal": "Render accessibility map visualization for neighborhoods using geo-data.",
+        "metadata": {
+          "keywords": [
+            17
+          ]
+        }
+      },
+      {
+        "id": "94e66154-5236-40bb-9a2d-7aaf1c9a01aa",
+        "type": "VIS_UTK",
+        "x": 4120.394073460726,
+        "y": -1163.2348977056508,
+        "content": "{\n    \"components\": [\n        {\n            \"id\": \"grammar_map\",\n            \"position\": {\n                \"width\": [\n                    1,\n                    12\n                ],\n                \"height\": [\n                    1,\n                    4\n                ]\n            }\n        }\n    ],\n    \"knots\": [],\n    \"ex_knots\": [\n        {\n            \"id\": \"neighborhood0\",\n            \"out_name\": \"neighborhood\",\n            \"in_name\": \"uncertainty\"\n        }\n    ],\n    \"grid\": {\n        \"width\": 12,\n        \"height\": 4\n    },\n    \"grammar\": false\n}",
+        "out": "DEFAULT",
+        "in": "DEFAULT",
+        "goal": "Render Urban Toolkit visualizations to illustrate neighborhood accessibility and uncertainty from the merged datasets, enabling dynamic user interaction for data exploration.",
+        "metadata": {
+          "keywords": [
+            15
+          ]
+        }
+      },
+      {
+        "id": "42249e4d-f4ce-4325-a472-3371ff36b4fa",
+        "type": "COMPUTATION_ANALYSIS",
+        "x": -97.05185065823082,
+        "y": -928.8618624700116,
+        "content": "import numpy as np\r\n\r\ngdf_streets = arg.set_crs(4326)\r\ngdf_streets = gdf_streets.to_crs(3395)\r\n\r\nw_noCurb = 1\r\nw_obstacle = 1\r\nw_surfaceProblem = 1\r\nw_curb = 1\r\n\r\nnumerator = (w_noCurb * gdf_streets[\"NoCurbRamp\"] + \r\n             w_obstacle * gdf_streets[\"Obstacle\"] + \r\n             w_surfaceProblem * gdf_streets[\"SurfaceProblem\"])\r\n\r\ndenominator = w_curb * gdf_streets[\"CurbRamp\"]\r\n\r\ngdf_streets[\"accessibility\"] = np.where(\r\n    denominator == 0, \r\n    0, \r\n    numerator / denominator\r\n)\r\n\r\nmin_val = gdf_streets[\"accessibility\"].min()\r\nmax_val = gdf_streets[\"accessibility\"].max()\r\n\r\ndenominator = max_val - min_val\r\n\r\nif denominator == 0:\r\n    gdf_streets[\"accessibility\"] = 0  # Set a default value\r\nelse:\r\n    gdf_streets[\"accessibility\"] = (gdf_streets[\"accessibility\"] - min_val) / denominator\r\n\r\ngdf_streets = gdf_streets[[\"geometry\", \"accessibility\"]]\r\n\r\ngdf_streets.metadata = {\r\n 'name': 'street'\r\n}\r\n\r\nreturn gdf_streets",
+        "out": "DEFAULT",
+        "in": "DEFAULT",
+        "goal": "Calculate accessibility score for 'access_score_streets' based on 'NoCurbRamp', 'Obstacle', and 'SurfaceProblem' attributes.",
+        "metadata": {
+          "keywords": [
+            17
+          ]
+        }
+      },
+      {
+        "id": "0988b6b5-0120-4c0c-8e6f-ee1a8bdf5d18",
+        "type": "DATA_TRANSFORMATION",
+        "x": 751.0621613605215,
+        "y": -928.3147127704804,
+        "content": "import geopandas as gpd\r\nfrom shapely.geometry import box\r\n\r\ngdf_streets = arg.set_crs(3395)\r\n\r\ngdf_streets = gdf_streets.to_crs(epsg=4326)\r\n\r\nmin_lat, max_lat = 47.616220289927874, 47.634222478980206\r\nmin_lon, max_lon = -122.30315628410251, -122.2731115883161\r\nbbox = box(min_lon, min_lat, max_lon, max_lat)\r\ngdf_streets = gdf_streets[gdf_streets.geometry.intersects(bbox)]\r\n\r\ngdf_streets = gdf_streets.to_crs(epsg=3857)  # Web Mercator (meters)\r\n\r\ngdf_polygons = gdf_streets.copy()\r\ngdf_polygons[\"geometry\"] = gdf_polygons.geometry.buffer(5)\r\n\r\ngdf_polygons = gdf_polygons.to_crs(epsg=3395)  # WGS84 (lat/lon)\r\n\r\ngdf_polygons.metadata = {\r\n 'name': 'street'\r\n}\r\n\r\nreturn gdf_polygons",
+        "out": "DEFAULT",
+        "in": "DEFAULT",
+        "goal": "Create a five meter buffer around the streets to transform them from LineString to Polygon.",
+        "metadata": {
+          "keywords": [
+            16
+          ]
+        }
+      },
+      {
+        "id": "b4c5ac6e-1ccb-4b8c-aeda-07d49554068d",
+        "type": "DATA_POOL",
+        "x": 1494.3940734607258,
+        "y": -1378.8618624700116,
+        "out": "DEFAULT",
+        "in": "DEFAULT",
+        "goal": "Manage the data repository for accessibility attributes, neighborhood scores, and street geometries, enabling real-time updates and interaction with the data across visualizations.",
+        "metadata": {
+          "keywords": [
+            16
+          ]
+        }
+      },
+      {
+        "id": "56729bc9-ca3e-42f6-b153-71ace4d70ee8",
+        "type": "VIS_UTK",
+        "x": 2426.394073460726,
+        "y": -2318.8618624700116,
+        "content": "{\n    \"components\": [\n        {\n            \"id\": \"grammar_map\",\n            \"position\": {\n                \"width\": [\n                    1,\n                    12\n                ],\n                \"height\": [\n                    1,\n                    4\n                ]\n            }\n        }\n    ],\n    \"knots\": [],\n    \"ex_knots\": [\n        {\n            \"id\": \"street0\",\n            \"out_name\": \"street\",\n            \"in_name\": \"accessibility\"\n        }\n    ],\n    \"grid\": {\n        \"width\": 12,\n        \"height\": 4\n    },\n    \"grammar\": false\n}",
+        "out": "DEFAULT",
+        "in": "DEFAULT",
+        "goal": "Render the Urban Toolkit visualization to depict neighborhood accessibility and uncertainty, showcasing key attributes like geometry and coverage from the cleaned datasets.",
+        "metadata": {
+          "keywords": [
+            17
+          ]
+        }
+      },
+      {
+        "id": "0f11ab65-a4df-42ca-a923-ef2226505fa2",
+        "type": "VIS_UTK",
+        "x": 2860.394073460726,
+        "y": -1430.8618624700116,
+        "content": "{\n    \"components\": [\n        {\n            \"id\": \"grammar_map\",\n            \"position\": {\n                \"width\": [\n                    1,\n                    12\n                ],\n                \"height\": [\n                    1,\n                    4\n                ]\n            }\n        }\n    ],\n    \"knots\": [],\n    \"ex_knots\": [\n        {\n            \"id\": \"street0\",\n            \"out_name\": \"street\",\n            \"in_name\": \"uncertainty\"\n        }\n    ],\n    \"grid\": {\n        \"width\": 12,\n        \"height\": 4\n    },\n    \"grammar\": false\n}",
+        "out": "DEFAULT",
+        "in": "DEFAULT",
+        "goal": "Render accessibility maps using Urban Toolkit visualizations, allowing for dynamic user interaction and exploration of neighborhood accessibility and uncertainty data.",
+        "metadata": {
+          "keywords": []
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge1",
+        "source": "node1",
+        "target": "node4",
+        "metadata": {
+          "keywords": [
+            0,
+            3
+          ]
+        }
+      },
+      {
+        "id": "edge2",
+        "source": "node4",
+        "target": "node7",
+        "metadata": {
+          "keywords": [
+            3
+          ]
+        }
+      },
+      {
+        "id": "edge3",
+        "source": "node2",
+        "target": "node5",
+        "metadata": {
+          "keywords": [
+            7
+          ]
+        }
+      },
+      {
+        "id": "edge4",
+        "source": "node3",
+        "target": "node6",
+        "metadata": {
+          "keywords": [
+            10
+          ]
+        }
+      },
+      {
+        "id": "edge5",
+        "source": "node7",
+        "target": "node13",
+        "metadata": {
+          "keywords": [
+            12
+          ]
+        }
+      },
+      {
+        "id": "edge7",
+        "source": "node7",
+        "target": "node14",
+        "metadata": {
+          "keywords": [
+            12
+          ]
+        }
+      },
+      {
+        "id": "edge9",
+        "source": "node13",
+        "target": "node15",
+        "metadata": {
+          "keywords": [
+            12
+          ]
+        }
+      },
+      {
+        "id": "edge10",
+        "source": "node14",
+        "target": "node16",
+        "metadata": {
+          "keywords": [
+            12
+          ]
+        }
+      },
+      {
+        "id": "reactflow__edge-node5out-1a815d0b-2298-4257-ab9a-857dd884338din",
+        "source": "node5",
+        "target": "1a815d0b-2298-4257-ab9a-857dd884338d",
+        "metadata": {
+          "keywords": [
+            7
+          ]
+        }
+      },
+      {
+        "id": "reactflow__edge-1a815d0b-2298-4257-ab9a-857dd884338dout-3a98c743-bee9-492a-b1ce-dbc17be97f14in",
+        "source": "1a815d0b-2298-4257-ab9a-857dd884338d",
+        "target": "3a98c743-bee9-492a-b1ce-dbc17be97f14",
+        "metadata": {
+          "keywords": [
+            0
+          ]
+        }
+      },
+      {
+        "id": "reactflow__edge-3a98c743-bee9-492a-b1ce-dbc17be97f14out-node12in",
+        "source": "3a98c743-bee9-492a-b1ce-dbc17be97f14",
+        "target": "node12",
+        "metadata": {
+          "keywords": [
+            14
+          ]
+        }
+      },
+      {
+        "type": "Interaction",
+        "id": "reactflow__edge-3a98c743-bee9-492a-b1ce-dbc17be97f14in/out-node12in/out",
+        "source": "3a98c743-bee9-492a-b1ce-dbc17be97f14",
+        "target": "node12",
+        "metadata": {
+          "keywords": [
+            14
+          ]
+        }
+      },
+      {
+        "type": "Interaction",
+        "id": "reactflow__edge-3a98c743-bee9-492a-b1ce-dbc17be97f14in/out-13d263ce-2e82-4e87-bc69-117b06a8a65bin/out",
+        "source": "3a98c743-bee9-492a-b1ce-dbc17be97f14",
+        "target": "13d263ce-2e82-4e87-bc69-117b06a8a65b",
+        "metadata": {
+          "keywords": [
+            12
+          ]
+        }
+      },
+      {
+        "id": "reactflow__edge-3a98c743-bee9-492a-b1ce-dbc17be97f14out-13d263ce-2e82-4e87-bc69-117b06a8a65bin",
+        "source": "3a98c743-bee9-492a-b1ce-dbc17be97f14",
+        "target": "13d263ce-2e82-4e87-bc69-117b06a8a65b",
+        "metadata": {
+          "keywords": [
+            12
+          ]
+        }
+      },
+      {
+        "id": "reactflow__edge-1a815d0b-2298-4257-ab9a-857dd884338dout-node13in",
+        "source": "1a815d0b-2298-4257-ab9a-857dd884338d",
+        "target": "node13",
+        "metadata": {
+          "keywords": [
+            12
+          ]
+        }
+      },
+      {
+        "id": "reactflow__edge-node15out-94e66154-5236-40bb-9a2d-7aaf1c9a01aain",
+        "source": "node15",
+        "target": "94e66154-5236-40bb-9a2d-7aaf1c9a01aa",
+        "metadata": {
+          "keywords": [
+            14
+          ]
+        }
+      },
+      {
+        "id": "reactflow__edge-42249e4d-f4ce-4325-a472-3371ff36b4faout-0988b6b5-0120-4c0c-8e6f-ee1a8bdf5d18in",
+        "source": "42249e4d-f4ce-4325-a472-3371ff36b4fa",
+        "target": "0988b6b5-0120-4c0c-8e6f-ee1a8bdf5d18",
+        "metadata": {
+          "keywords": [
+            12
+          ]
+        }
+      },
+      {
+        "id": "reactflow__edge-node6out-42249e4d-f4ce-4325-a472-3371ff36b4fain",
+        "source": "node6",
+        "target": "42249e4d-f4ce-4325-a472-3371ff36b4fa",
+        "metadata": {
+          "keywords": [
+            12
+          ]
+        }
+      },
+      {
+        "id": "reactflow__edge-0988b6b5-0120-4c0c-8e6f-ee1a8bdf5d18out-b4c5ac6e-1ccb-4b8c-aeda-07d49554068din",
+        "source": "0988b6b5-0120-4c0c-8e6f-ee1a8bdf5d18",
+        "target": "b4c5ac6e-1ccb-4b8c-aeda-07d49554068d",
+        "metadata": {
+          "keywords": [
+            12
+          ]
+        }
+      },
+      {
+        "id": "reactflow__edge-0988b6b5-0120-4c0c-8e6f-ee1a8bdf5d18out-node14in",
+        "source": "0988b6b5-0120-4c0c-8e6f-ee1a8bdf5d18",
+        "target": "node14",
+        "metadata": {
+          "keywords": [
+            12
+          ]
+        }
+      },
+      {
+        "id": "reactflow__edge-b4c5ac6e-1ccb-4b8c-aeda-07d49554068dout-56729bc9-ca3e-42f6-b153-71ace4d70ee8in",
+        "source": "b4c5ac6e-1ccb-4b8c-aeda-07d49554068d",
+        "target": "56729bc9-ca3e-42f6-b153-71ace4d70ee8",
+        "metadata": {
+          "keywords": [
+            12
+          ]
+        }
+      },
+      {
+        "id": "reactflow__edge-node16out-0f11ab65-a4df-42ca-a923-ef2226505fa2in",
+        "source": "node16",
+        "target": "0f11ab65-a4df-42ca-a923-ef2226505fa2",
+        "metadata": {
+          "keywords": [
+            12
+          ]
+        }
+      }
+    ],
+    "name": "DefaultWorkflow",
+    "task": "Load the 'access_attributes' dataset from a local CSV file, clean the data by filtering relevant fields and filling missing values for latitude, longitude, agree, disagree, and unsure counts while creating a GeoDataFrame for point geometries. Load the 'access_score_neighborhood' dataset from the 'access_score_neighborhood.geojson' file, retaining key fields like coverage, average attribute count, neighborhood name, and geometry for further analysis. Load the 'access_score_streets' dataset from 'access_score_streets.geojson', focusing on essential geometry attributes to ensure data integrity. Clean the 'access_score_neighborhood' dataset by removing records with missing values in coverage, geometry, and neighborhood name and similarly clean the streets dataset to maintain essential geometrical information. Compute the accessibility score for neighborhoods using the attributes 'NoCurbRamp', 'Obstacle', 'Surface Problem', and 'CurbRamp', merging these scores with the cleaned neighborhood data. Calculate the accessibility score for streets based on the same criteria and merge these computed scores with cleaned neighborhood scores for analysis. Finally, visualize the merged data to create accessibility maps using Urban Toolkit visualizations, enabling dynamic interaction and exploration of neighborhood accessibility and uncertainty data.",
+    "timestamp": 1742865089884,
+    "provenance_id": "DefaultWorkflow"
+  }
+}
