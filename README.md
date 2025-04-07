@@ -1,7 +1,7 @@
 # Urbanite [![Discord](https://img.shields.io/badge/Discord-738ADB)](https://discord.gg/vjpSMSJR8r)
 
 <div align="center">
-  <img src="https://github.com/urban-toolkit/urbanite/blob/main/logo.png?raw=true" alt="Urbanite Logo" height="300"/></br>
+  <img src="https://github.com/urban-toolkit/urbanite/blob/main/logo.png?raw=true" alt="Urbanite Logo" height="360"/></br>
   <!-- [<a href="https://arxiv.org/abs/2408.06139">Paper</a>] | [<a href="https://urbantk.org/curio">Website</a>] -->
 </div>
 
