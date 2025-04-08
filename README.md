@@ -1,13 +1,14 @@
 # Urbanite [![Discord](https://img.shields.io/badge/Discord-738ADB)](https://discord.gg/vjpSMSJR8r)
 
 <div align="center">
-  <img src="https://github.com/urban-toolkit/urbanite/blob/main/logo.png?raw=true" alt="Urbanite Logo" height="360"/></br>
+  <img src="https://github.com/urban-toolkit/urbanite/blob/main/logo-white.png?raw=true" alt="Urbanite Logo" height="360"/></br>
+  [<a href="https://urbantk.org/urbanite">Website</a>]
   <!-- [<a href="https://arxiv.org/abs/2408.06139">Paper</a>] | [<a href="https://urbantk.org/curio">Website</a>] -->
 </div>
 
 ## Overview
 
-Urbanite is a framework for human-AI collaboration in urban visual analytics. Urbanite leverages a dataflow-based model that allows users to specify intent at multiple scopes, enabling interactive alignment across the specification, process, and evaluation stages of urban analytics. Urbanite incorporates features to facilitate explainability, multi-resolution definition of tasks across dataflows, nodes, and parameters, while supporting the provenance of interactions.
+UUrbanite is a framework for human-AI collaboration in urban visual analytics that leverages a dataflow-based model allowing users to specify intent at multiple scopes, enabling interactive alignment across specification, process, and evaluation stages. The framework incorporates features for explainability, multi-resolution task definition across dataflows, nodes, and parameters, and supporting interaction provenance based on findings from a survey identifying existing challenges.
 
 **Urbanite: A Dataflow-Based Framework for Human-AI Interactive Alignment in Urban Visual Analytics**  
 Gustavo Moreira, Leonardo Ferreira, Carolina Veiga, Maryam Hosseini, and Fabio Miranda  
