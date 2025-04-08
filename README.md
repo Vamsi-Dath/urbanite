@@ -14,7 +14,9 @@ UUrbanite is a framework for human-AI collaboration in urban visual analytics th
 Gustavo Moreira, Leonardo Ferreira, Carolina Veiga, Maryam Hosseini, and Fabio Miranda  
 Paper: Under Review
 
-<!-- Video: -->
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/7d640ca8-52c2-4ff0-9f8d-bd7c64df7073" />
+</div>
 
 <!-- <div align="center">
   <video src="https://github.com/urban-toolkit/curio/assets/2387594/6d29bda8-5e94-4496-a4ae-fd55adff024f" />
