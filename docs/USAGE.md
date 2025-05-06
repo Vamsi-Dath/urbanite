@@ -31,6 +31,8 @@ conda activate urbanite
 
 You can install Urbanite using Docker, which will handle the orchestration of all required servers automatically, or install each component manually for more control and customization.
 
+Urbanite's current version uses ChatGPT. You need to add your OpenAI API key to the file `backend/api.env`. Check [here](https://platform.openai.com/api-keys) to get an OpenAI API key.
+
 ### Installing via Docker
 
 Docker is the easiest way to get Urbanite up and running. It handles the orchestration of all necessary components: the backend, sandbox, and frontend.
