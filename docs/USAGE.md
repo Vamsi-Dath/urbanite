@@ -9,13 +9,10 @@
 ## Installation
 
 
-Because Urbanite is integrated with UTK it is necessary to add it as a submodule.
+Begin by cloning Urbanite's repository:
 
 ```console
 git clone git@github.com:urban-toolkit/urbanite.git
-cd urbanite
-git submodule init
-git submodule update --remote --merge
 ```
 
 Urbanite is divided into three components: backend (provenance and database management), Python sandbox (to run Python code), and the frontend. All components need to be running.
@@ -42,6 +39,11 @@ Prerequisites:
 
 After cloning the repository and initializing submodules (see above), run the full Urbanite stack with:
 
+```console
+docker compose up --build
+```
+
+For older Docker versions, the following command may be required instead:
 ```console
 docker-compose up --build
 ```

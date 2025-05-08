@@ -8,9 +8,10 @@ images
 Census*
 model.pth
 dataset
+
+logs/
+flask_cache/
+
 *.csv
-*.geojson
 *.json
-data
-flood_case
-*data
+*.geojson

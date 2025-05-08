@@ -1,12 +1,23 @@
 FROM --platform=linux/amd64 python:3.10-slim-bullseye
-COPY . /app/sandbox
+
 WORKDIR /app/sandbox
-RUN apt-get -y update && apt-get -y install build-essential libgdal-dev ffmpeg libsm6 libxext6 clang libglib2.0-dev python-dev
-RUN pip install --no-cache-dir -r requirements.txt
+
+# Clean old apt cache, update, install dependencies with --fix-missing to avoid broken builds,
+# and clean apt lists to reduce final image size
+RUN apt-get clean && apt-get update && apt-get install -y --fix-missing \
+    curl build-essential libgdal-dev ffmpeg libsm6 libxext6 clang libglib2.0-dev python-dev \
+ && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --prefer-binary --no-cache-dir -r requirements.txt
+
+# Install UTK package
+COPY . .
 RUN pip install utk-0.8.9.tar.gz
-ENV FLASK_RUN_HOST=0.0.0.0
-ENV FLASK_RUN_PORT=2000
-ENV FLASK_APP=server.py
+
+# Expose sandbox service port
 EXPOSE 2000
 
+# Run sandbox server
 CMD ["python", "server.py"]
