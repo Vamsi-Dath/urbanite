@@ -14,12 +14,13 @@ import json
 import pandas as pd
 import geopandas as gpd
 
-app = Flask(__name__)
-address = 'localhost'
-port = 5002
 
-api_address = 'http://localhost'
-api_port = 2000
+app = Flask(__name__)
+address=os.getenv('FLASK_RUN_HOST', 'localhost')
+port=int(os.getenv('FLASK_RUN_PORT', 5002))
+
+api_address = os.getenv('SANDBOX_ADDRESS', 'localhost')
+api_port = int(os.getenv('SANDBOX_PORT', 2000))
 
 conversation = {}
 
@@ -84,6 +85,10 @@ def add_cors_headers(response):
 @app.route('/')
 def root():
     abort(403)
+
+@app.route('/health', methods=['GET'])
+def health():
+    return 'OK', 200
 
 @app.route('/liveness')
 def liveness():

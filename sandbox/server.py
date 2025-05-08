@@ -20,6 +20,10 @@ def add_cors_headers(response):
 def root():
     abort(403)
 
+@app.route('/health', methods=['GET'])
+def health():
+    return 'OK', 200
+
 @app.route('/liveness', methods=['GET'])
 def liveness():
     return 'Sandbox is live.'
