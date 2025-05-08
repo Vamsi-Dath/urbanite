@@ -1,4 +1,4 @@
-# Urbanite [![Discord](https://img.shields.io/badge/Discord-738ADB)](https://discord.gg/vjpSMSJR8r)
+# Urbanite [![Discord](https://img.shields.io/badge/Discord-738ADB)](https://discord.gg/vjpSMSJR8r) [![Full stack build](https://github.com/urban-toolkit/urbanite/actions/workflows/docker-compose.yml/badge.svg)](https://github.com/urban-toolkit/urbanite/actions/workflows/docker-compose.yml)
 
 <div align="center">
   <img src="https://github.com/urban-toolkit/urbanite/blob/main/logo-white.png?raw=true" alt="Urbanite Logo" height="360"/></br>
